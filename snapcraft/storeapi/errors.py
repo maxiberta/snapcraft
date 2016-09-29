@@ -40,22 +40,23 @@ class SnapNotFoundError(StoreError):
     __FMT_ARCH_CHANNEL = (
         'Snap {name!r} for {arch!r} cannot be found in the {channel!r} '
         'channel.')
-
-    __FMT_ARCH = 'Snap {name!r} was not found in the {channel!r} channel.'
-
-    __FMT_SERIES = 'The snap "{name}" was not found in series {series}.'
+    __FMT_CHANNEL = 'Snap {name!r} was not found in the {channel!r} channel.'
+    __FMT_ARCH = 'Snap {name!r} for {arch!r} was not found.'
+    __FMT_SERIES = 'Snap {name!r} was not found in {series!r} series.'
 
     fmt = 'Snap {name!r} was not found.'
 
     def __init__(self, name, channel=None, arch=None, series=None):
         if channel and arch:
             self.fmt = self.__FMT_ARCH_CHANNEL
+        elif channel:
+            self.fmt = self.__FMT_CHANNEL
         elif arch:
             self.fmt = self.__FMT_ARCH
         elif series:
             self.fmt = self.__FMT_SERIES
 
-        super().__init__(name=name, arch=arch, channel=channel)
+        super().__init__(name=name, arch=arch, channel=channel, series=series)
 
 
 class SHAMismatchError(StoreError):

@@ -364,15 +364,9 @@ def download(snap_name, channel, download_path, arch):
 
 def history(snap_name, series, arch):
     store = storeapi.StoreClient()
-    try:
-        with _requires_login():
-            history = store.get_snap_history(snap_name, series, arch)
-    except storeapi.errors.SnapNotFoundError:
-        raise RuntimeError(
-            'Snap "{name}" for {arch} in {series} series '
-            'cannot be found.'.format(
-                name=snap_name, series=series or 'any',
-                arch=arch or 'any arch'))
+
+    with _requires_login():
+        history = store.get_snap_history(snap_name, series, arch)
 
     parsed_revisions = [
         (rev['revision'], rev['timestamp'], rev['arch'], rev['version'],
@@ -387,15 +381,9 @@ def history(snap_name, series, arch):
 
 def status(snap_name, series, arch):
     store = storeapi.StoreClient()
-    try:
-        with _requires_login():
-            status = store.get_snap_status(snap_name, series, arch)
-    except storeapi.errors.SnapNotFoundError:
-        raise RuntimeError(
-            'Snap "{name}" for {arch} in {series} series '
-            'cannot be found.'.format(
-                name=snap_name, series=series or 'any',
-                arch=arch or 'any arch'))
+
+    with _requires_login():
+        status = store.get_snap_status(snap_name, series, arch)
 
     parsed_channels = [
         channel
