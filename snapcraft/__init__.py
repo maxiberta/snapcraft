@@ -239,6 +239,7 @@ from snapcraft._store import (                      # noqa
     register,
     register_key,
     release,
+    sign_build,
     status,
 )
 from snapcraft import common                        # noqa
