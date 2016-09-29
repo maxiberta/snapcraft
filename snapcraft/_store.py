@@ -369,8 +369,9 @@ def history(snap_name, series, arch):
             history = store.get_snap_history(snap_name, series, arch)
     except storeapi.errors.SnapNotFoundError:
         raise RuntimeError(
-            'The snap "{name}" for {arch} in {series} cannot be found.'.format(
-                name=snap_name, series=series or 'any series',
+            'Snap "{name}" for {arch} in {series} series '
+            'cannot be found.'.format(
+                name=snap_name, series=series or 'any',
                 arch=arch or 'any arch'))
 
     parsed_revisions = [
@@ -391,8 +392,9 @@ def status(snap_name, series, arch):
             status = store.get_snap_status(snap_name, series, arch)
     except storeapi.errors.SnapNotFoundError:
         raise RuntimeError(
-            'The snap "{name}" for {arch} in {series} cannot be found.'.format(
-                name=snap_name, series=series or 'any series',
+            'Snap "{name}" for {arch} in {series} series '
+            'cannot be found.'.format(
+                name=snap_name, series=series or 'any',
                 arch=arch or 'any arch'))
 
     parsed_channels = [

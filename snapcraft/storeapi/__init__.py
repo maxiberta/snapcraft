@@ -193,19 +193,19 @@ class StoreClient():
 
     def get_snap_history(self, snap_name, series=None, arch=None):
         account_info = self.get_account_information()
-        if series:
-            try:
+        snap_id = None
+        try:
+            if series:
                 snap_id = account_info['snaps'][series][snap_name]['snap-id']
-                logging.info(snap_id)
-            except KeyError:
-                raise errors.SnapNotFoundError(snap_name, series=series)
-        else:
-            snap_id = None
-            for key, value in account_info['snaps'].items():
-                if snap_name in value:
-                    snap_id = value[snap_name]['snap-id']
-            if snap_id is None:
-                raise errors.SnapNotFoundError(snap_name)
+            else:
+                for key, value in account_info['snaps'].items():
+                    if snap_name in value:
+                        snap_id = value[snap_name]['snap-id']
+        except KeyError:
+            raise errors.SnapNotFoundError(snap_name, series=series)
+
+        if snap_id is None:
+            raise errors.SnapNotFoundError(snap_name)
 
         return self._refresh_if_necessary(
             self.sca.snap_history, snap_id, series, arch)
@@ -500,7 +500,7 @@ class SCAClient(Client):
                      'Content-Type': 'application/json',
                      'Accept': 'application/json'})
         if not response.ok:
-            raise errors.StoreSnapHistoryError(snap_id, series, arch)
+            raise errors.StoreSnapHistoryError(response, snap_id, series, arch)
 
         response_json = response.json()
 
