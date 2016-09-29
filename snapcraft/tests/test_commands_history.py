@@ -74,7 +74,7 @@ class HistoryCommandTestCase(tests.TestCase):
             main(['history', 'snap-test'])
 
         self.assertIn(
-            'Snap "snap-test" for any arch in any series cannot be found.',
+            "Snap 'snap-test' was not found.",
             self.fake_logger.output)
 
     @mock.patch.object(storeapi.StoreClient, 'get_account_information')
@@ -85,7 +85,7 @@ class HistoryCommandTestCase(tests.TestCase):
             main(['history', 'snap-test', '--arch=arm64'])
 
         self.assertIn(
-            'Snap "snap-test" for arm64 in any series cannot be found.',
+            "Snap 'snap-test' for 'arm64' was not found.",
             self.fake_logger.output)
 
     @mock.patch.object(storeapi.StoreClient, 'get_account_information')
@@ -96,7 +96,7 @@ class HistoryCommandTestCase(tests.TestCase):
             main(['history', 'snap-test', '--series=15'])
 
         self.assertIn(
-            'Snap "snap-test" for any arch in 15 series cannot be found.',
+            "Snap 'snap-test' was not found in '15' series.",
             self.fake_logger.output)
 
     @mock.patch.object(storeapi.StoreClient, 'get_snap_history')
