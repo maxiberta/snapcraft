@@ -37,10 +37,20 @@ class StoreError(SnapcraftError):
 
 class SnapNotFoundError(StoreError):
 
-    fmt = 'The "{name}" for {arch} was not found in {channel}.'
+    __FMT_ARCH_CHANNEL = (
+        'The snap "{name}" for {arch} was not found in {channel}.')
 
-    def __init__(self, name, channel, arch):
-        super().__init__(name=name, channel=channel, arch=arch)
+    __FMT_SERIES = 'The snap "{name}" was not found in series {series}.'
+
+    fmt = 'The snap "{name}" was not found.'
+
+    def __init__(self, name, channel=None, arch=None, series=None):
+        if channel and arch:
+            self.fmt = self.__FMT_ARCH_CHANNEL
+        elif series:
+            self.fmt = self.__FMT_SERIES
+
+        super().__init__(name=name, arch=arch, channel=channel)
 
 
 class SHAMismatchError(StoreError):
@@ -225,3 +235,29 @@ class StoreReleaseError(StoreError):
 
         super().__init__(snap_name=snap_name, status_code=response.status_code,
                          **response_json)
+
+
+class StoreSnapStatusError(StoreError):
+
+    fmt = (
+        'Error fetching status of snap id "{snap_id}" for {arch} '
+        'in series {series}: {error}.')
+
+    def __init__(self, response, snap_id, series, arch):
+        error = '{} {}'.format(response.status_code, response.reason)
+        try:
+            response_json = response.json()
+            if 'error_list' in response_json:
+                error = ' '.join(
+                    error['message'] for error in response_json['error_list'])
+        except JSONDecodeError:
+            pass
+        super().__init__(
+            snap_id=snap_id, arch=arch or 'any arch',
+            series=series or 'any series', error=error)
+
+
+class StoreSnapHistoryError(StoreSnapStatusError):
+    fmt = (
+        'Error fetching history of snap id "{snap_id}" for {arch} '
+        'in series {series}: {error}.')

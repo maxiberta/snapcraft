@@ -247,6 +247,19 @@ def _get_text_for_channel(channel):
     return channel_text
 
 
+def _format_channel_map(channel_map, arch):
+    return [
+        (printable_arch,) + _get_text_for_channel(channel)
+        for printable_arch, channel in zip(
+            [arch] + [''] * len(channel_map), channel_map)]
+
+
+def _get_text_for_current_channels(channels, current_channels):
+    return ', '.join(
+        channel + ('*' if channel in current_channels else '')
+        for channel in channels) or '-'
+
+
 def release(snap_name, revision, release_channels):
     store = storeapi.StoreClient()
     with _requires_login():
@@ -281,3 +294,46 @@ def download(snap_name, channel, download_path, arch):
         raise RuntimeError(
             'Failed to download {} at {} (mismatched SHA)'.format(
                 snap_name, download_path))
+
+
+def history(snap_name, series, arch):
+    store = storeapi.StoreClient()
+    try:
+        with _requires_login():
+            history = store.get_snap_history(snap_name, series, arch)
+    except storeapi.errors.SnapNotFoundError:
+        raise RuntimeError(
+            'The snap "{name}" for {arch} in {series} cannot be found.'.format(
+                name=snap_name, series=series or 'any series',
+                arch=arch or 'any arch'))
+
+    parsed_revisions = [
+        (rev['revision'], rev['timestamp'], rev['arch'], rev['version'],
+         _get_text_for_current_channels(
+            rev['channels'], rev['current_channels']))
+        for rev in history]
+    tabulated_revisions = tabulate(
+        parsed_revisions,
+        headers=['Rev.', 'Uploaded', 'Arch', 'Version', 'Channels'])
+    print(tabulated_revisions)
+
+
+def status(snap_name, series, arch):
+    store = storeapi.StoreClient()
+    try:
+        with _requires_login():
+            status = store.get_snap_status(snap_name, series, arch)
+    except storeapi.errors.SnapNotFoundError:
+        raise RuntimeError(
+            'The snap "{name}" for {arch} in {series} cannot be found.'.format(
+                name=snap_name, series=series or 'any series',
+                arch=arch or 'any arch'))
+
+    parsed_channels = [
+        channel
+        for arch, channel_map in sorted(status.items())
+        for channel in _format_channel_map(channel_map, arch)]
+
+    tabulated_channels = tabulate(
+        parsed_channels, headers=['Arch', 'Channel', 'Version', 'Revision'])
+    print(tabulated_channels)
