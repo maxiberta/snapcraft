@@ -106,8 +106,8 @@ class DownloadTestCase(tests.TestCase):
             self.client.download(
                 'unexisting-snap', 'test-channel', 'dummy', 'test-arch')
         self.assertEqual(
-            'Snap "unexisting-snap" for test-arch was not found in '
-            'test-channel.',
+            "Snap 'unexisting-snap' for 'test-arch' cannot be found in "
+            "the 'test-channel' channel.",
             str(e.exception))
 
     def test_download_snap(self):
@@ -715,7 +715,7 @@ class GetSnapStatusTestCase(tests.TestCase):
     def test_get_snap_status_filter_by_arch(self):
         self.client.login('dummy', 'test correct password')
         self.assertEqual(
-                {'amd64': self.expected['amd64']},
+            {'amd64': self.expected['amd64']},
             self.client.get_snap_status('basic', arch='amd64'))
 
     def test_get_snap_status_filter_by_series_and_filter(self):

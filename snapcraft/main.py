@@ -300,7 +300,7 @@ def _is_store_command(args):
     return any(args.get(command) for command in commands)
 
 
-def _run_store_command(args):
+def _run_store_command(args):  # noqa: C901
     if args['list-keys'] or args['keys']:
         snapcraft.list_keys()
     elif args['register-key']:
